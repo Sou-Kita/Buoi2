@@ -51,28 +51,20 @@
   ],
   "comments": [
     {
-      "id": "1",
       "text": "a comment about post 1",
       "postId": "1",
       "isDeleted": false
     },
     {
-      "id": "2",
-      "text": "another comment about post 1",
-      "postId": "1",
+      "text": "another comment about post 2",
+      "postId": "2",
       "isDeleted": false
     },
     {
-      "id": "3",
-      "text": "cv",
-      "postId": "1",
-      "isDeleted": true
-    },
-    {
-      "id": "4",
-      "text": "hyurthg",
-      "postId": "4",
-      "isDeleted": true
+      "text": "huy",
+      "postId": 3,
+      "isDeleted": false,
+      "id": "b74e"
     }
   ],
   "profile": {

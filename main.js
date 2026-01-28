@@ -21,36 +21,20 @@ async function LoadComments() {
   let container = document.getElementById("comments_container");
   container.innerHTML = "";
 
-  // Group comments by postId
-  let commentsByPost = {};
+  // Display each comment with its post info
   for (const comment of comments) {
-    if (!commentsByPost[comment.postId]) {
-      commentsByPost[comment.postId] = [];
-    }
-    commentsByPost[comment.postId].push(comment);
-  }
-
-  // Display comments grouped by post
-  for (const postId in commentsByPost) {
-    let section = document.createElement("div");
-    section.className = "comment-section";
-    section.innerHTML = `<h3>Comments for Post ${postId}</h3>`;
-
-    for (const comment of commentsByPost[postId]) {
-      let commentClass = comment.isDeleted ? 'class="strikethrough"' : "";
-      let commentDiv = document.createElement("div");
-      commentDiv.className = "comment-item";
-      commentDiv.innerHTML = `
-        <div ${commentClass}>
-          <strong>Comment ID: ${comment.id}</strong><br/>
-          ${comment.text}
-        </div>
-        <button onclick="EditComment(${comment.id}, ${postId})">Edit</button>
-        <button onclick="DeleteComment(${comment.id})">Delete</button>
-      `;
-      section.appendChild(commentDiv);
-    }
-    container.appendChild(section);
+    let commentClass = comment.isDeleted ? 'class="strikethrough"' : "";
+    let commentDiv = document.createElement("div");
+    commentDiv.className = "comment-item";
+    commentDiv.innerHTML = `
+      <div ${commentClass}>
+        <strong>Post ID: ${comment.postId}</strong><br/>
+        ${comment.text}
+      </div>
+      <button onclick="EditComment(${comment.postId})">Edit</button>
+      <button onclick="DeleteComment(${comment.postId})">Delete</button>
+    `;
+    container.appendChild(commentDiv);
   }
 }
 
@@ -146,34 +130,52 @@ async function SaveComment() {
     return false;
   }
 
-  // Get max comment ID
-  let res = await fetch("http://localhost:3000/comments");
-  let comments = await res.json();
-  let maxId =
-    comments.length > 0
-      ? Math.max(...comments.map((c) => parseInt(c.id) || 0))
-      : 0;
-  let newId = String(maxId + 1);
+  // Check if comment already exists for this post
+  let commentsRes = await fetch(
+    "http://localhost:3000/comments?postId=" + postId,
+  );
+  let comments = await commentsRes.json();
 
-  // CREATE new comment
   try {
-    let createRes = await fetch("http://localhost:3000/comments", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        id: newId,
-        text: text,
-        postId: postId,
-        isDeleted: false,
-      }),
-    });
-    if (createRes.ok) {
-      console.log("Comment created successfully");
-      document.getElementById("comment_postId").value = "";
-      document.getElementById("comment_txt").value = "";
+    if (comments.length > 0) {
+      // Update existing comment
+      let commentId = comments[0].id;
+      let updateRes = await fetch(
+        "http://localhost:3000/comments/" + commentId,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            text: text,
+            postId: postId,
+            isDeleted: false,
+          }),
+        },
+      );
+      if (updateRes.ok) {
+        console.log("Comment updated successfully");
+      }
+    } else {
+      // Create new comment
+      let createRes = await fetch("http://localhost:3000/comments", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          text: text,
+          postId: postId,
+          isDeleted: false,
+        }),
+      });
+      if (createRes.ok) {
+        console.log("Comment created successfully");
+      }
     }
+    document.getElementById("comment_postId").value = "";
+    document.getElementById("comment_txt").value = "";
   } catch (error) {
     console.log(error);
   }
@@ -182,10 +184,16 @@ async function SaveComment() {
   return false;
 }
 
-async function EditComment(commentId, postId) {
-  // Fetch comment data to get current text
-  let res = await fetch("http://localhost:3000/comments/" + commentId);
-  let comment = await res.json();
+async function EditComment(postId) {
+  // Fetch comment data using filter query
+  let res = await fetch("http://localhost:3000/comments?postId=" + postId);
+  let comments = await res.json();
+
+  if (comments.length === 0) {
+    return;
+  }
+
+  let comment = comments[0];
   let oldText = comment.text;
 
   let newText = prompt("Edit comment:", oldText);
@@ -194,13 +202,12 @@ async function EditComment(commentId, postId) {
   }
 
   // UPDATE comment
-  let updateRes = await fetch("http://localhost:3000/comments/" + commentId, {
+  let updateRes = await fetch("http://localhost:3000/comments/" + comment.id, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      id: commentId,
       text: newText,
       postId: postId,
       isDeleted: false,
@@ -212,9 +219,19 @@ async function EditComment(commentId, postId) {
   LoadComments();
 }
 
-async function DeleteComment(commentId) {
+async function DeleteComment(postId) {
+  // Find comment by postId using filter query
+  let res = await fetch("http://localhost:3000/comments?postId=" + postId);
+  let comments = await res.json();
+
+  if (comments.length === 0) {
+    return;
+  }
+
+  let comment = comments[0];
+
   // SOFT DELETE comment
-  let res = await fetch("http://localhost:3000/comments/" + commentId, {
+  let deleteRes = await fetch("http://localhost:3000/comments/" + comment.id, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
@@ -223,7 +240,7 @@ async function DeleteComment(commentId) {
       isDeleted: true,
     }),
   });
-  if (res.ok) {
+  if (deleteRes.ok) {
     console.log("Comment deleted successfully");
   }
   LoadComments();
