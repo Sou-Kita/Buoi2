@@ -1,0 +1,81 @@
+{
+  "$schema": "./node_modules/json-server/schema.json",
+  "posts": [
+    {
+      "id": "1",
+      "title": "a title",
+      "views": 100
+    },
+    {
+      "id": "2",
+      "title": "another title",
+      "views": 200
+    },
+    {
+      "id": "3",
+      "title": "another title",
+      "views": 200
+    },
+    {
+      "id": "4",
+      "title": "chu tu",
+      "views": "900"
+    },
+    {
+      "id": "5",
+      "title": "to",
+      "views": "900"
+    },
+    {
+      "id": "6",
+      "title": "hahah",
+      "views": "999"
+    },
+    {
+      "id": "7",
+      "title": "hehehhe",
+      "views": "999"
+    },
+    {
+      "id": "8",
+      "title": "huy",
+      "views": "100",
+      "isDeleted": true
+    },
+    {
+      "id": "9",
+      "title": "huyuy",
+      "views": "109",
+      "isDeleted": false
+    }
+  ],
+  "comments": [
+    {
+      "id": "1",
+      "text": "a comment about post 1",
+      "postId": "1",
+      "isDeleted": false
+    },
+    {
+      "id": "2",
+      "text": "another comment about post 1",
+      "postId": "1",
+      "isDeleted": false
+    },
+    {
+      "id": "3",
+      "text": "cv",
+      "postId": "1",
+      "isDeleted": true
+    },
+    {
+      "id": "4",
+      "text": "hyurthg",
+      "postId": "4",
+      "isDeleted": true
+    }
+  ],
+  "profile": {
+    "name": "typicode"
+  }
+}

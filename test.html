@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="main.js"></script>
+    <style>
+        .strikethrough { text-decoration: line-through; color: #999; }
+    </style>
+</head>
+
+<body>
+    <h2>Posts</h2>
+    <div>
+        <input type="text" id="id_txt" readonly />
+        <input type="text" id="title_txt" />
+        <input type="text" id="view_txt" />
+        <input type="submit" value="Save" onclick="Save()">
+    </div>
+
+    <table border="1">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>TITLE</th>
+                <th>VIEWS</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="body_table">
+        </tbody>
+    </table>
+
+    <h2>Comments</h2>
+    <div>
+        <input type="text" id="comment_postId" placeholder="Post ID" />
+        <input type="text" id="comment_txt" placeholder="Comment" />
+        <input type="submit" value="Add" onclick="SaveComment()">
+    </div>
+
+    <div id="comments_container"></div>
+</body>
+
+</html>
